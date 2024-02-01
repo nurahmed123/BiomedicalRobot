@@ -8,7 +8,7 @@
 
 */
 
-#define DEBUG_ROBOT_ARM                                         
+// #define DEBUG_ROBOT_ARM
 #define PC
 
 /**************************** initialize library ************************/
@@ -40,9 +40,9 @@ CommunicationParser communicationParser;
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
-  #ifdef PC
+#ifdef PC
   Serial1.begin(9600);
-  #endif
+#endif
   Serial.println("start");
   pinMode(2, OUTPUT);
   digitalWrite(2, LOW);
@@ -52,7 +52,7 @@ void setup() {
   AttachServos();
 
   i2c_lcd_setup();
-  show_lcd(0, 0, "System booting." );
+  show_lcd(0, 0, "System booting.");
 
 #ifdef DEBUG_ROBOT_ARM
   armIdlePosition();
@@ -70,118 +70,119 @@ void setup() {
   pinMode(ultravioletPin, OUTPUT);
 
 
-  digitalWrite( pumpPin, HIGH);
-  digitalWrite( ultravioletPin, LOW);
+  digitalWrite(pumpPin, HIGH);
+  digitalWrite(ultravioletPin, LOW);
 
   delay(500);
 
 
-//  while ( !Serial1.available() )
-//  {
-//    show_lcd(0, 1, "waiting for MP" );
-//  }
-//  Serial.flush();
-//
-//  while ( !Serial1.available() )
-//  {
-//    show_lcd(0, 1, "waiting for MP" );
-//  }
+  //  while ( !Serial1.available() )
+  //  {
+  //    show_lcd(0, 1, "waiting for MP" );
+  //  }
+  //  Serial.flush();
+  //
+  //  while ( !Serial1.available() )
+  //  {
+  //    show_lcd(0, 1, "waiting for MP" );
+  //  }
   lcdClear();
-
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
 
 
-  show_lcd(0, 0, "Robot ARM Ready" );
+  show_lcd(0, 0, "Robot ARM Ready");
 
   communicationParser.checkSerial();
+  if (humanDetectFlag == 1) {
 
-  if ( mouthCloseFlag == 1 and  takeCottonBarFlag == 0 )
-  {
-     show_lcd(0, 1, "                " );
-    show_lcd(0, 1, "place your finger" );
-    int heart_rate, sp02;
-    pulse_sensor_read(&heart_rate, &sp02);
-    show_lcd(0, 1, "heart_rate", heart_rate );
-    delay(1000);
-    show_lcd(0, 1, "sp02", sp02 );
-    
-    takeCottonBar();
-    //takeCovidSample();   ///
-    show_lcd(0, 1, "                " );
-    show_lcd(0, 1, "PLZ open mouth" );
-    delay(1000);
-    Serial1.flush();
+
+
+    if (mouthCloseFlag == 1 and takeCottonBarFlag == 0) {
+      show_lcd(0, 1, "                ");
+      show_lcd(0, 1, "place your finger");
+      int heart_rate, sp02;
+      pulse_sensor_read(&heart_rate, &sp02);
+      show_lcd(0, 1, "heart_rate", heart_rate);
+      delay(1000);
+      show_lcd(0, 1, "sp02", sp02);
+
+      takeCottonBar();
+      //takeCovidSample();   ///
+      show_lcd(0, 1, "                ");
+      show_lcd(0, 1, "PLZ open mouth");
+      delay(1000);
+      Serial1.flush();
+    }
+
+    if (mouthCloseFlag == 1 and takeCottonBarFlag == 1) {
+      show_lcd(0, 1, "                ");
+      show_lcd(0, 1, "PLZ open mouth");
+      delay(1000);
+      Serial1.flush();
+    }
+
+    // if (mouthOpenFlag == 1 and takeCottonBarFlag == 0) {
+
+    //   show_lcd(0, 1, "                ");
+    //   show_lcd(0, 1, "PLZ wait");
+    //   takeCottonBar();  ///
+    //   //takeCovidSample();
+    //   Serial1.flush();
+    // }
+
+    if (mouthOpenFlag == 1 and takeCottonBarFlag == 1) {
+      //    takeCovidSample();
+      // sensitiveControll(3, 160, 2, 130, 35, 0);
+      takeCovidSample();
+      // delay(3000);
+      // sensitiveControll(3, 160, 2, 130, 35, 0);
+      putCottonBarInBox();
+      show_lcd(0, 1, "                ");
+      show_lcd(0, 1, "Thank You");
+
+      putCottonBarInBox();
+      // sensitiveControll(3, 160, 2, 70, 25, 0);
+      // servoControll(4, 80);
+
+      show_lcd(0, 1, "                ");
+      show_lcd(0, 1, "you may go");
+
+      // sendBox();
+      armIdlePosition();
+      delay(200);
+      digitalWrite(pumpPin, LOW);
+      digitalWrite(ultravioletPin, HIGH);
+
+      show_lcd(0, 1, "                ");
+      show_lcd(0, 1, "UV start");
+      delay(3000);
+
+      digitalWrite(pumpPin, HIGH);
+      digitalWrite(ultravioletPin, LOW);
+      show_lcd(0, 1, "                ");
+      show_lcd(0, 1, "UV stop");
+      delay(1000);
+
+      show_lcd(0, 1, "                ");
+      show_lcd(0, 1, "Complete!!");
+
+      delay(1000);
+
+      communicationParser.responseHandle("DONE");
+
+      mouthOpenFlag = 0;
+      mouthCloseFlag = 0;
+      humanDetectFlag = 0;
+      takeCottonBarFlag = 0;
+      Serial1.flush();
+    } else {
+    }
   }
-
-  if ( mouthCloseFlag == 1 and  takeCottonBarFlag == 1 )
-  {
-    show_lcd(0, 1, "                " );
-    show_lcd(0, 1, "PLZ open mouth" );
-    delay(1000);
-    Serial1.flush();
-  }
-
-  if ( mouthOpenFlag == 1 and  takeCottonBarFlag == 0)
-  {
-
-    show_lcd(0, 1, "                " );
-    show_lcd(0, 1, "PLZ wait" );
-    takeCottonBar();  ///
-    //takeCovidSample();
-    Serial1.flush();
-  }
-
-  if ( mouthOpenFlag == 1 and  takeCottonBarFlag == 1)
-  {
-    //    takeCovidSample();
-    sensitiveControll( 3, 160, 2, 130, 35, 0);
-    delay(3000);
-    sensitiveControll( 3, 125, 2, 95, 30, 1);
-    show_lcd(0, 1, "                " );
-    show_lcd(0, 1, "Thank You" );
-
-    putCottonBarInBox();
-    sensitiveControll( 3, 160, 2, 70, 25, 0);
-    servoControll(4, 80);
-
-    show_lcd(0, 1, "                " );
-    show_lcd(0, 1, "you may go" );
-
-    sendBox();
+  else{
     armIdlePosition();
-    delay(200);
-    digitalWrite( pumpPin, LOW);
-    digitalWrite( ultravioletPin, HIGH);
-
-    show_lcd(0, 1, "                " );
-    show_lcd(0, 1, "UV start" );
-    delay(3000);
-
-    digitalWrite( pumpPin, HIGH);
-    digitalWrite( ultravioletPin, LOW);
-    show_lcd(0, 1, "                " );
-    show_lcd(0, 1, "UV stop" );
-    delay(1000);
-
-    show_lcd(0, 1, "                " );
-    show_lcd(0, 1, "Complete!!" );
-
-    delay(1000);
-
-    communicationParser.responseHandle("DONE");
-
-    mouthOpenFlag = 0;
-    mouthCloseFlag = 0;
-    humanDetectFlag = 0;
-    takeCottonBarFlag = 0;
-    Serial1.flush();
-  }
-  else
-  {
-
   }
 
   delay(200);
