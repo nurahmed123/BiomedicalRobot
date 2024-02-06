@@ -1,6 +1,8 @@
 from facialLandMarkFromVideo import *
 import serialCommunication
 
+from playsound import playsound
+
 
 
 
@@ -17,6 +19,8 @@ while True:
         distanceCalculationOfHumanFace.findDistance()
         print("running {}".format( distanceCalculationOfHumanFace.Distance ))
         if distanceCalculationOfHumanFace.Distance < human_detect_threshold:
+            say = "sit.mp3"
+            playsound(say, True)
             print("break")
             break
             # return

@@ -7,6 +7,7 @@ import time
 from config import *
 import serialCommunication
 from distanceCalculationOfHumanFace import cap
+from playsound import playsound
 
 # cap = cv2.VideoCapture(0)
 
@@ -67,6 +68,8 @@ def findFacialLandMark():
             if human_detect_flag == True:
                 serialCommunication.sendCmd("MC\n")
                 print("MC")
+                say = "open.mp3"
+                playsound(say, True)
     # show the output image with the face detections + facial landmarks
     if RASPBERRY:
         pass

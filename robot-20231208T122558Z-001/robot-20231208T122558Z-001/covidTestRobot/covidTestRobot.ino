@@ -183,6 +183,7 @@ void loop() {
   }
   else{
     armIdlePosition();
+    // takeCovidSample();
   }
 
   delay(200);
