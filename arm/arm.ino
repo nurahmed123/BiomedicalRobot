@@ -23,7 +23,7 @@ void setup() {
 
   // Set button pin as INPUT
   pinMode(buttonPin, INPUT);
-  Serial.begin(9600);
+  Serial.begin(115200);
 }
 
 void loop() {
