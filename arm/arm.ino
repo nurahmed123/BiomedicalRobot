@@ -14,7 +14,7 @@ int servoPosition = 0;
 int buttonState;
 int lastButtonState = LOW;
 unsigned long lastDebounceTime = 0;
-unsigned long debounceDelay = 50;
+unsigned long debounceDelay = 10;
 
 void setup() {
   // Attach the servo to its pin
